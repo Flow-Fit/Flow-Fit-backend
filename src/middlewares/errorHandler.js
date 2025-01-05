@@ -1,4 +1,4 @@
-// const { Prisma } = require("@prisma/client");
+const { Prisma } = require("@prisma/client");
 
 // 에러 코드 및 기본 메세지
 // 필요에 따라 추가 및 수정
