@@ -13,4 +13,10 @@ async function comparePassword(plainPassword, hashedPassword) {
   return bcrypt.compare(plainPassword, hashedPassword);
 }
 
-module.exports = { hashPassword, comparePassword };
+// 비밀번호 필드 제거 유틸리티 함수
+async function removePasswordField(user) {
+  const { password, ...safeUser } = user;
+  return safeUser;
+};
+
+module.exports = { hashPassword, comparePassword , removePasswordField};

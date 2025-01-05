@@ -3,7 +3,7 @@ const { object, string, enums, refine, size, partial } = require('superstruct');
 // 이메일 형식 검증
 const Email = refine(string(), 'Email', (value) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(value) || 'Invalid email format. Example: user@example.com';
+    return emailRegex.test(value) || '잘못된 이메일 형식. Example: user@example.com';
 });
 
 // 비밀번호 규칙: 8자 이상, 하나 이상의 영어와 숫자 포함
@@ -11,7 +11,7 @@ const Password = refine(string(), 'Password', (value) => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     return (
         passwordRegex.test(value) ||
-        'Password must be at least 8 characters long, include at least one letter and one number.'
+        '비밀번호는 최소 8자 이상이어야 하며, 적어도 하나의 문자와 하나의 숫자를 포함해야 합니다.'
     );
 });
 

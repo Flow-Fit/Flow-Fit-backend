@@ -1,5 +1,5 @@
 const express = require("express");
-const asyncHandler = require("../controllers/asyncHandler");
+const asyncHandler = require("../utils/asyncHandler");
 const { ErrorCodes, CustomError } = require("../middlewares/errorHandler");
 const router = express.Router();
 

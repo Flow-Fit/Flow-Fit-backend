@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const { assert } = require('superstruct');
 const { createUserStruct,updateUserStruct } = require('../struct/userStruct');
-const { hashPassword, comparePassword } = require("../utils/password");
+const { hashPassword, comparePassword , removePasswordField } = require("../utils/password");
 const { ErrorCodes, CustomError } = require("../middlewares/errorHandler");
 const jwt = require('jsonwebtoken');
 
@@ -16,9 +16,11 @@ const createUser = async (data) => {
     
     data.password = hashedPassword
 
-    return await prisma.user.create({
+    const user = await prisma.user.create({
         data
-    });
+    })
+
+    return removePasswordField(user);
 };
 
 // 사용자 로그인
@@ -44,31 +46,39 @@ const loginUser = async (username, password) => {
         { expiresIn: '1h' }
     );
 
-    return { token, user };
+    return { token, user: removePasswordField(user) };
 };
 
 // 사용자 조회
 const getUserById = async (id) => {
-    return await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
         where: { id: parseInt(id) },
     });
+
+    return removePasswordField(user);
 };
 
 // 사용자 수정
 const updateUser = async (id, data) => {
     assert(data, updateUserStruct);
 
-    return await prisma.user.update({
+    const user = await prisma.user.update({
         where: { id: parseInt(id) },
         data,
     });
+
+    return removePasswordField(user);
 };
 
 // 사용자 삭제
 const deleteUser = async (id) => {
-    return await prisma.user.delete({
+    const user = await prisma.user.delete({
         where: { id: parseInt(id) },
     });
+    
+    return removePasswordField(user);
 };
+
+// 사용자의 정보
 
 module.exports = { createUser, loginUser, getUserById, updateUser, deleteUser };

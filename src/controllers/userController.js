@@ -5,7 +5,7 @@ const {
     updateUser,
     deleteUser,} = require('../services/userService');
 
-const asyncHandler = require('./asyncHandler')
+const asyncHandler = require('../utils/asyncHandler')
 
 // 사용자 생성
 const createUserController = asyncHandler( async (req, res, next) => {

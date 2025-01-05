@@ -1,10 +1,12 @@
 const jwt = require("jsonwebtoken");
 const { ErrorCodes, CustomError } = require("./errorHandler")
+const asyncHandler = require("../utils/asyncHandler")
+const { getUserById } = require("../services/userService")
 
 SECRET_KEY = env.SECRET_KEY
 
 // JWT 검증 미들웨어
-const authenticateToken = async (req, res, next) => {
+const authenticateToken = asyncHandler(async (req, res, next) => {
     let token;
 
     const authHeader = req.headers["authorization"];
@@ -14,12 +16,13 @@ const authenticateToken = async (req, res, next) => {
         token = req.query.token;
     }
 
-    if (!token) 
+    if (!token){
         throw new CustomError( ErrorCodes.Forbidden ,'Unauthorized: 토큰이 없습니다.'); // 토큰 없음
-
+    }
+    
     const decoded = jwt.verify(token, SECRET_KEY);
     console.log("Decoded Token:", decoded);
-    const user = await User.findById(decoded.id);
+    const user = await getUserById(decoded.id);
 
     if (!user) {
         throw new CustomError( ErrorCodes.NotFound , "Unauthorized: 사용자가 없습니다.");
@@ -28,6 +31,6 @@ const authenticateToken = async (req, res, next) => {
     req.user = user; // 이 이후에는 req.user가 데이터베이스의 user
     
     next();
-};
+});
 
 module.exports = authenticateToken;
