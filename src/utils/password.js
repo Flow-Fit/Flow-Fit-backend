@@ -14,7 +14,7 @@ async function comparePassword(plainPassword, hashedPassword) {
 }
 
 // 비밀번호 필드 제거 유틸리티 함수
-async function removePasswordField(user) {
+function removePasswordField(user) {
   const { password, ...safeUser } = user;
   return safeUser;
 };

@@ -6,7 +6,7 @@ const {
   updateUserController,
   deleteUserController,
 } = require("../controllers/userController");
-const { authenticateToken } = require("../middlewares/jwtMiddlewares")
+const { authenticateToken } = require("../middlewares/jwtMiddlewares");
 
 const router = express.Router();
 
@@ -66,6 +66,8 @@ router.post("/login", loginUserController);
  *   get:
  *     summary: "사용자 조회"
  *     tags: [User]
+ *     security:
+ *       - BearerAuth: [] # 인증 추가
  *     responses:
  *       200:
  *         description: "사용자 정보 반환"
@@ -74,7 +76,7 @@ router.post("/login", loginUserController);
  *             schema:
  *               $ref: "#/components/schemas/User"
  */
-router.get("/user",  authenticateToken , getUserByIdController);
+router.get("/user", authenticateToken, getUserByIdController);
 
 /**
  * @swagger
@@ -82,6 +84,8 @@ router.get("/user",  authenticateToken , getUserByIdController);
  *   put:
  *     summary: "사용자 수정"
  *     tags: [User]
+ *     security:
+ *       - BearerAuth: [] # 인증 추가
  *     requestBody:
  *       required: true
  *       content:
@@ -96,19 +100,21 @@ router.get("/user",  authenticateToken , getUserByIdController);
  *             schema:
  *               $ref: "#/components/schemas/User"
  */
-router.put("/user",  authenticateToken , updateUserController);
+router.put("/user", authenticateToken, updateUserController);
 
 /**
  * @swagger
- * /api/user/{id}:
+ * /api/user:
  *   delete:
  *     summary: "사용자 삭제"
  *     tags: [User]
+ *     security:
+ *       - BearerAuth: [] # 인증 추가
  *     responses:
  *       204:
  *         description: "삭제 성공"
  */
-router.delete("/user",  authenticateToken , deleteUserController);
+router.delete("/user", authenticateToken, deleteUserController);
 
 module.exports = router;
 
@@ -188,4 +194,9 @@ module.exports = router;
  *         name:
  *           type: string
  *           description: "사용자 이름 (선택)"
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */

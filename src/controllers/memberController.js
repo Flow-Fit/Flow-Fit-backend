@@ -1,4 +1,6 @@
 const {
+    getMemberSchedulesByMonth, 
+    getRelatedTrainers,
     proposeScheduleByMember,
     acceptScheduleByMember,
     rejectScheduleByMember,
@@ -6,6 +8,31 @@ const {
 } = require("../services/memberService");
 
 const asyncHandler = require('../utils/asyncHandler');
+
+// 멤버가 자신의 스케줄 조회 (특정 한 달)
+const getMemberSchedulesByMonthController = asyncHandler(async (req, res) => {
+    const { month } = req.query;
+    const member = req.role;
+
+    if (!month) {
+        throw new CustomError(ErrorCodes.BadRequest, 'month는 필수입니다. 형식: YYYY-MM');
+    }
+
+    const monthDate = new Date(`${month}-01`); // YYYY-MM 형식에서 Date 객체 생성
+    if (isNaN(monthDate)) {
+        throw new CustomError(ErrorCodes.BadRequest, '올바른 month 형식이 아닙니다. 예: 2025-01');
+    }
+
+    const schedules = await getMemberSchedulesByMonth(member.id, monthDate);
+    res.status(200).json(schedules);
+});
+
+// 멤버가 자신과 관련 있는 트레이너 조회
+const getRelatedTrainersController = asyncHandler(async (req, res) => {
+    const member = req.role;
+    const trainers = await getRelatedTrainers(member.id);
+    res.status(200).json(trainers);
+});
 
 // 스케줄 제안 (멤버)
 const proposeScheduleByMemberController = asyncHandler(async (req, res) => {
@@ -40,6 +67,8 @@ const cancelScheduleByMemberController = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+    getMemberSchedulesByMonthController,
+    getRelatedTrainersController,
     proposeScheduleByMemberController,
     acceptScheduleByMemberController,
     rejectScheduleByMemberController,

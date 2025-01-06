@@ -65,7 +65,7 @@ const loginUser = async (username, password) => {
         { expiresIn: '1h' }
     );
 
-    return { token, user: removePasswordField(user) };
+    return { token, user : removePasswordField(user) };
 };
 
 // 사용자 조회
@@ -73,7 +73,6 @@ const getUserById = async (id) => {
     const user = await prisma.user.findUnique({
         where: { id: parseInt(id) },
     });
-
     return removePasswordField(user);
 };
 

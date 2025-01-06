@@ -24,6 +24,48 @@ const checkOrCreateMember = async (user) => {
     }
 };
 
+const getMemberSchedulesByMonth = async (memberId, month) => {
+    const startOfMonth = new Date(month);
+    startOfMonth.setDate(1); // 달의 첫 날
+    const endOfMonth = new Date(startOfMonth);
+    endOfMonth.setMonth(endOfMonth.getMonth() + 1); // 다음 달의 첫 날
+
+    const schedules = await prisma.schedule.findMany({
+        where: {
+            memberId,
+            date: { gte: startOfMonth, lt: endOfMonth },
+        },
+        orderBy: { date: 'asc' },
+    });
+
+    return schedules;
+};
+
+const getRelatedTrainers = async (memberId) => {
+    const trainers = await prisma.trainer.findMany({
+        where: {
+            members: { some: { id: memberId } },
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    phoneNumber: true,
+                },
+            },
+        },
+    });
+
+    return trainers.map((trainer) => ({
+        id: trainer.id,
+        name: trainer.user.name,
+        email: trainer.user.email,
+        phoneNumber: trainer.user.phoneNumber,
+    }));
+};
+
 // 스케줄 상태 열거형
 const ScheduleStatus = {
     MEMBER_PROPOSED: "MEMBER_PROPOSED",
@@ -136,6 +178,8 @@ const cancelSchedule = async (memberId, scheduleId) => {
 
 module.exports = {
     checkOrCreateMember,
+    getMemberSchedulesByMonth, 
+    getRelatedTrainers ,
     proposeScheduleByMember,
     acceptScheduleByMember,
     rejectScheduleByMember,

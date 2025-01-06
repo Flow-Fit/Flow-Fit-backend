@@ -1,5 +1,7 @@
 const express = require("express");
 const {
+    getMemberSchedulesByMonthController,
+    getRelatedTrainersController,
     proposeScheduleByMemberController,
     acceptScheduleByMemberController,
     rejectScheduleByMemberController,
@@ -9,13 +11,73 @@ const { authenticateToken } = require("../middlewares/jwtMiddlewares");
 const { memberMiddleware } = require("../middlewares/roleMiddlewares");
 
 const router = express.Router();
+/**
+ * @swagger
+ * /api/member/schedules:
+ *   get:
+ *     summary: "멤버가 자신의 스케줄 조회 (특정 한 달)"
+ *     tags: [Member]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: month
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: "조회할 달 (YYYY-MM)"
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: "멤버의 스케줄 리스트 반환"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: "#/components/schemas/Schedule"
+ */
+router.get('/schedules', authenticateToken, memberMiddleware, getMemberSchedulesByMonthController);
+
+/**
+ * @swagger
+ * /api/member/trainers:
+ *   get:
+ *     summary: "멤버가 자신과 관련 있는 트레이너 조회"
+ *     tags: [Member]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: "멤버와 관련된 트레이너 리스트 반환"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: "트레이너 ID"
+ *                   name:
+ *                     type: string
+ *                     description: "트레이너 이름"
+ *                   email:
+ *                     type: string
+ *                     description: "트레이너 이메일"
+ *                   phoneNumber:
+ *                     type: string
+ *                     description: "트레이너 전화번호"
+ */
+router.get('/trainers', authenticateToken, memberMiddleware, getRelatedTrainersController);
 
 /**
  * @swagger
  * /api/member/schedules/propose:
  *   post:
  *     summary: "멤버가 트레이너에게 스케줄 제안"
- *     tags: [Member Schedules]
+ *     tags: [Member]
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -54,7 +116,7 @@ router.post("schedules/propose", authenticateToken, memberMiddleware, proposeSch
  * /api/member/schedules/{scheduleId}/accept:
  *   put:
  *     summary: "멤버가 트레이너가 제안한 스케줄 수락"
- *     tags: [Member Schedules]
+ *     tags: [Member]
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -85,7 +147,7 @@ router.put( "/schedules/:scheduleId/accept", authenticateToken, memberMiddleware
  * /api/member/schedules/{scheduleId}/reject:
  *   put:
  *     summary: "멤버가 트레이너가 제안한 스케줄 거절"
- *     tags: [Member Schedules]
+ *     tags: [Member]
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -118,7 +180,7 @@ router.put(
  * /api/member/schedules/{scheduleId}/cancel:
  *   delete:
  *     summary: "멤버가 스케줄 취소 또는 삭제"
- *     tags: [Member Schedules]
+ *     tags: [Member]
  *     security:
  *       - BearerAuth: []
  *     parameters:

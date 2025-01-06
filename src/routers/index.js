@@ -27,7 +27,7 @@ router.use("", userRouters);
  *   name: Member
  *   description: 회원 관련 엔드포인트
  */
-router.use("member/", memberRouters);
+router.use("/member", memberRouters);
 
 /**
  * @swagger
@@ -35,6 +35,6 @@ router.use("member/", memberRouters);
  *   name: Trainer
  *   description: 트레이너 관련 엔드포인트
  */
-router.use("trainer/", trainerRouters);
+router.use("/trainer", trainerRouters);
 
 module.exports = router;

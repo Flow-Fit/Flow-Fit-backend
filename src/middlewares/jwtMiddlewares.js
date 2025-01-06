@@ -22,9 +22,11 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
     if (!token) {
         throw new CustomError(ErrorCodes.Unauthorized, 'Unauthorized: 토큰이 없습니다.'); // 토큰 없음
     }
-
+    
+    let decoded;
+    
     try {
-        const decoded = jwt.verify(token, SECRET_KEY); // 토큰 검증
+        decoded = jwt.verify(token, SECRET_KEY); // 토큰 검증
         console.log("Decoded Token:", decoded);
     } catch (error) {
         // 토큰 만료 에러 처리
@@ -43,8 +45,8 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
     }
 
     req.user = user; // 검증된 사용자 데이터를 req.user에 저장
+    
     next();
-
 });
 
 module.exports = { authenticateToken };
