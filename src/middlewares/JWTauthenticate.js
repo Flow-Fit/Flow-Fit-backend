@@ -1,14 +1,17 @@
 const jwt = require("jsonwebtoken");
-const { ErrorCodes, CustomError } = require("./errorHandler")
-const asyncHandler = require("../utils/asyncHandler")
-const { getUserById } = require("../services/userService")
+const { ErrorCodes, CustomError } = require("./errorHandler");
+const asyncHandler = require("../utils/asyncHandler");
+const { getUserById } = require("../services/userService");
 
-SECRET_KEY = env.SECRET_KEY
+require('dotenv').config(); // 환경 변수 로드
+
+const SECRET_KEY = process.env.JWT_SECRET; // 환경 변수에서 SECRET_KEY 로드
 
 // JWT 검증 미들웨어
 const authenticateToken = asyncHandler(async (req, res, next) => {
     let token;
 
+    // 헤더 또는 쿼리에서 토큰 가져오기
     const authHeader = req.headers["authorization"];
     if (authHeader) {
         token = authHeader.split(" ")[1];
@@ -16,21 +19,31 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
         token = req.query.token;
     }
 
-    if (!token){
-        throw new CustomError( ErrorCodes.Forbidden ,'Unauthorized: 토큰이 없습니다.'); // 토큰 없음
-    }
-    
-    const decoded = jwt.verify(token, SECRET_KEY);
-    console.log("Decoded Token:", decoded);
-    const user = await getUserById(decoded.id);
-
-    if (!user) {
-        throw new CustomError( ErrorCodes.NotFound , "Unauthorized: 사용자가 없습니다.");
+    if (!token) {
+        throw new CustomError(ErrorCodes.Unauthorized, 'Unauthorized: 토큰이 없습니다.'); // 토큰 없음
     }
 
-    req.user = user; // 이 이후에는 req.user가 데이터베이스의 user
-    
-    next();
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY); // 토큰 검증
+        console.log("Decoded Token:", decoded);
+
+        const user = await getUserById(decoded.id);
+
+        if (!user) {
+            throw new CustomError(ErrorCodes.NotFound, "Unauthorized: 사용자가 없습니다.");
+        }
+
+        req.user = user; // 검증된 사용자 데이터를 req.user에 저장
+        next();
+    } catch (error) {
+        // 토큰 만료 에러 처리
+        if (error.name === "TokenExpiredError") {
+            throw new CustomError(ErrorCodes.Unauthorized, "Unauthorized: 토큰이 만료되었습니다.");
+        }
+
+        // 기타 토큰 검증 실패 에러 처리
+        throw new CustomError(ErrorCodes.Unauthorized, "Unauthorized: 유효하지 않은 토큰입니다.");
+    }
 });
 
 module.exports = authenticateToken;
