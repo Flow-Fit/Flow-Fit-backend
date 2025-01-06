@@ -6,6 +6,7 @@ const {
   updateUserController,
   deleteUserController,
 } = require("../controllers/userController");
+const { authenticateToken } = require("../middlewares/jwtMiddlewares")
 
 const router = express.Router();
 
@@ -61,17 +62,10 @@ router.post("/login", loginUserController);
 
 /**
  * @swagger
- * /api/user/{id}:
+ * /api/user:
  *   get:
- *     summary: "특정 사용자 조회"
+ *     summary: "사용자 조회"
  *     tags: [User]
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *         description: "사용자 ID"
  *     responses:
  *       200:
  *         description: "사용자 정보 반환"
@@ -80,21 +74,14 @@ router.post("/login", loginUserController);
  *             schema:
  *               $ref: "#/components/schemas/User"
  */
-router.get("/user/:id", getUserByIdController);
+router.get("/user",  authenticateToken , getUserByIdController);
 
 /**
  * @swagger
- * /api/user/{id}:
+ * /api/user:
  *   put:
- *     summary: "특정 사용자 수정"
+ *     summary: "사용자 수정"
  *     tags: [User]
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *         description: "사용자 ID"
  *     requestBody:
  *       required: true
  *       content:
@@ -109,26 +96,19 @@ router.get("/user/:id", getUserByIdController);
  *             schema:
  *               $ref: "#/components/schemas/User"
  */
-router.put("/user/:id", updateUserController);
+router.put("/user",  authenticateToken , updateUserController);
 
 /**
  * @swagger
  * /api/user/{id}:
  *   delete:
- *     summary: "특정 사용자 삭제"
+ *     summary: "사용자 삭제"
  *     tags: [User]
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *         description: "사용자 ID"
  *     responses:
  *       204:
  *         description: "삭제 성공"
  */
-router.delete("/user/:id", deleteUserController);
+router.delete("/user",  authenticateToken , deleteUserController);
 
 module.exports = router;
 

@@ -26,15 +26,6 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, SECRET_KEY); // 토큰 검증
         console.log("Decoded Token:", decoded);
-
-        const user = await getUserById(decoded.id);
-
-        if (!user) {
-            throw new CustomError(ErrorCodes.NotFound, "Unauthorized: 사용자가 없습니다.");
-        }
-
-        req.user = user; // 검증된 사용자 데이터를 req.user에 저장
-        next();
     } catch (error) {
         // 토큰 만료 에러 처리
         if (error.name === "TokenExpiredError") {
@@ -44,6 +35,16 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
         // 기타 토큰 검증 실패 에러 처리
         throw new CustomError(ErrorCodes.Unauthorized, "Unauthorized: 유효하지 않은 토큰입니다.");
     }
+
+    const user = await getUserById(decoded.id);
+
+    if (!user) {
+        throw new CustomError(ErrorCodes.NotFound, "Unauthorized: 사용자가 없습니다.");
+    }
+
+    req.user = user; // 검증된 사용자 데이터를 req.user에 저장
+    next();
+
 });
 
-module.exports = authenticateToken;
+module.exports = { authenticateToken };

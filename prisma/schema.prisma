@@ -62,7 +62,10 @@ enum Role {
 }
 
 enum Status {
-  SCHEDULED
-  COMPLETED
-  CANCELED
+  MEMBER_PROPOSED  // 멤버가 제안한 상태
+  TRAINER_PROPOSED // 트레이너가 제안한 상태
+  REJECTED         // 거절 상태
+  SCHEDULED        // PT가 확정된 상태
+  COMPLETED        // 완료된 상태
+  CANCELED         // 취소된 상태
 }
