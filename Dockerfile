@@ -1,6 +1,14 @@
 # Node.js 18.18.0 이미지를 사용
 FROM node:18.18.0
 
+# 빌드 타임 환경 변수 설정
+ARG DATABASE_URL
+ARG JWT_SECRET
+
+# 런타임 환경 변수 설정
+ENV DATABASE_URL=$DATABASE_URL
+ENV JWT_SECRET=$JWT_SECRET
+
 # 작업 디렉토리 설정
 WORKDIR /usr/src/app
 
