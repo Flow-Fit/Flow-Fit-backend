@@ -1,5 +1,5 @@
-# 베이스 이미지 설정
-FROM node:16
+# Node.js 18.18.0 이미지를 사용
+FROM node:18.18.0
 
 # 작업 디렉토리 설정
 WORKDIR /usr/src/app
@@ -8,11 +8,21 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 
-# 소스 코드 복사
+# Prisma CLI 설치 (글로벌 또는 프로젝트 내 설치에 따라 조정)
+RUN npx prisma --version
+
+# Prisma schema 파일 복사 (Prisma CLI 실행 전에 필요)
+COPY prisma ./prisma
+
+# Prisma 명령어 실행 (예: generate와 migrate)
+RUN npx prisma generate
+RUN npx prisma migrate deploy
+
+# 애플리케이션 소스 코드 복사
 COPY . .
 
-# 앱 포트 설정
+# 포트 노출
 EXPOSE 3000
 
-# 앱 실행 명령어
+# 애플리케이션 시작
 CMD ["npm", "start"]
