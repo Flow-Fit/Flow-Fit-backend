@@ -20,6 +20,19 @@ const createUser = async (data) => {
         data
     })
 
+    if(user.role == 'MEMBER'){
+        const member = await prisma.member.create({
+            data: { userId: user.id },
+        })
+    }
+
+    if(user.role == 'TRAINER'){
+        const trainer = await prisma.trainer.create({
+            data: { userId: user.id },
+        })
+    }
+
+
     return removePasswordField(user);
 };
 
@@ -38,11 +51,17 @@ const loginUser = async (username, password) => {
     if (!isPasswordValid) {
         throw new CustomError(ErrorCodes.BadRequest,'비밀번호가 틀렸습니다.');
     }
+    // JWT_SECRET 확인
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+        throw new Error("JWT_SECRET 환경 변수가 설정되지 않았습니다.");
+    }
 
     // JWT 생성
     const token = jwt.sign(
         { id: user.id, role: user.role },
-        process.env.JWT_SECRET,
+        secret,
         { expiresIn: '1h' }
     );
 
