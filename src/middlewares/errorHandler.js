@@ -1,4 +1,4 @@
-// const { Prisma } = require("@prisma/client");
+const { Prisma } = require("@prisma/client");
 
 // 에러 코드 및 기본 메세지
 // 필요에 따라 추가 및 수정
@@ -25,7 +25,7 @@ const ErrorCodes = {
   },
   Conflict: {
     code: 409,
-    message: "충돌이 발생했습니다",
+    message: "충돌이 발생했습니다.",
   },
 };
 
@@ -44,53 +44,64 @@ class CustomError extends Error {
 // 필요에 따라 에러 처리 추가
 // 커스텀 에러가 아닌 에러에 대한 추가 필요!
 const errorHandler = (err, req, res, next) => {
-  console.error(err.message);
+  try{
+    console.error(err);
 
-  if (err instanceof CustomError) {
-    return res.status(err.code).json({
-      message: err.message,
+    if (err instanceof CustomError) {
+      return res.status(err.code).json({
+        message: err.message,
+      });
+    }
+
+    if (err.name == "StructError") {
+      return res.status(400).json({
+        message: err.message.split('--')[1].trim()
+      });
+    }
+
+    // Prisma의 Known Request Error 처리
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      // 에러 코드에 따라 분기 처리
+      switch (err.code) {
+        case "P2002":
+          // 고유 제약 조건 위반 (중복된 값)
+          return res.status(ErrorCodes.Conflict.code).json({
+            message: ErrorCodes.Conflict.message,
+            errormeta: err.meta || null, // err.meta가 존재하면 반환, 없으면 null
+          });
+        case "P2025":
+          // 레코드를 찾을 수 없음
+          return res.status(ErrorCodes.NotFound.code).json({
+            message: ErrorCodes.NotFound.message,
+            errormeta: err.meta || null, // err.meta가 존재하면 반환, 없으면 null
+          });
+        // 다른 에러 코드에 대한 처리 추가 가능
+        default:
+          return res.status(ErrorCodes.BadRequest.code).json({
+            message: err.message,
+            errormeta: err.meta || null, // err.meta가 존재하면 반환, 없으면 null
+          });
+      }
+    }
+
+    // Prisma의 Validation Error 처리
+    if (err instanceof Prisma.PrismaClientValidationError) {
+      return res.status(ErrorCodes.BadRequest.code).json({
+        message: "데이터 유효성 검증 오류가 발생했습니다",
+      });
+    }
+
+    // 예상치 못한 에러의 경우
+    return res.status(500).json({
+      message: "예상치 못한 오류가 발생했습니다",
     });
   }
-
-  if (err.name == "StructError") {
-    return res.status(400).json({
-      message: err.message,
+  catch {
+    // 에러 처리중 예상치 못한 에러의 경우
+    return res.status(500).json({
+      message: "에러 처리 중 예상치 못한 오류가 발생했습니다",
     });
   }
-
-//   // Prisma의 Known Request Error 처리
-//   if (err instanceof Prisma.PrismaClientKnownRequestError) {
-//     // 에러 코드에 따라 분기 처리
-//     switch (err.code) {
-//       case "P2002":
-//         // 고유 제약 조건 위반 (중복된 값)
-//         return res.status(ErrorCodes.Conflict.code).json({
-//           message: ErrorCodes.Conflict.message,
-//         });
-//       case "P2025":
-//         // 레코드를 찾을 수 없음
-//         return res.status(ErrorCodes.NotFound.code).json({
-//           message: ErrorCodes.NotFound.message,
-//         });
-//       // 다른 에러 코드에 대한 처리 추가 가능
-//       default:
-//         return res.status(ErrorCodes.BadRequest.code).json({
-//           message: err.message,
-//         });
-//     }
-//   }
-
-//   // Prisma의 Validation Error 처리
-//   if (err instanceof Prisma.PrismaClientValidationError) {
-//     return res.status(ErrorCodes.BadRequest.code).json({
-//       message: "데이터 유효성 검증 오류가 발생했습니다",
-//     });
-//   }
-
-  // 예상치 못한 에러의 경우
-  return res.status(500).json({
-    message: "예상치 못한 오류가 발생했습니다",
-  });
 };
 
 // 사용 예시
