@@ -8,7 +8,7 @@ const {
 } = require("../services/memberService");
 
 const asyncHandler = require('../utils/asyncHandler');
-
+ 
 // 멤버가 자신의 스케줄 조회 (특정 한 달)
 const getMemberSchedulesByMonthController = asyncHandler(async (req, res) => {
     const { month } = req.query;
@@ -24,6 +24,7 @@ const getMemberSchedulesByMonthController = asyncHandler(async (req, res) => {
     }
 
     const schedules = await getMemberSchedulesByMonth(member.id, monthDate);
+
     res.status(200).json(schedules);
 });
 

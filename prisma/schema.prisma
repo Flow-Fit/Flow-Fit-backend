@@ -33,7 +33,7 @@ model Member {
   id           Int      @id @default(autoincrement())
   userId       Int      @unique
   user         User     @relation(fields: [userId], references: [id])
-  trainers     Trainer[] // 연결된 트레이너 목록
+  trainers     TrainerMember[] // 연결된 트레이너 목록
   schedules    Schedule[] // 관련된 스케줄 목록
 }
 
@@ -41,8 +41,22 @@ model Trainer {
   id           Int      @id @default(autoincrement())
   userId       Int      @unique
   user         User     @relation(fields: [userId], references: [id])
-  members      Member[]  // 관리하는 회원 목록
+  members      TrainerMember[]  // 관리하는 회원 목록
   schedules    Schedule[] // PT 스케줄
+}
+
+model TrainerMember {
+  id             Int      @id @default(autoincrement())
+  memberId       Int
+  trainerId      Int
+  member         Member   @relation(fields: [memberId], references: [id])
+  trainer        Trainer  @relation(fields: [trainerId], references: [id])
+
+  // 추가 정보
+  ptStartDate    DateTime // PT 시작일
+
+  // 고유 제약조건
+  @@unique([memberId, trainerId]) // 한 회원-트레이너 조합은 중복될 수 없음
 }
 
 model Schedule {
@@ -50,10 +64,24 @@ model Schedule {
   date         DateTime // PT 날짜 및 시간
   location     String?  // PT 장소 (선택적)
   status       Status   @default(SCHEDULED) // 일정 상태
+  trainingTarget String
+  comment      String?
+  exerciseDetails ExerciseDetail[]
   memberId     Int
   trainerId    Int
   member       Member   @relation(fields: [memberId], references: [id])
   trainer      Trainer  @relation(fields: [trainerId], references: [id])
+}
+
+model ExerciseDetail {
+  id           Int       @id @default(autoincrement())
+  scheduleId Int      // FitnessGoal과 연결
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  exerciseName  String    // 운동 이름 (예: 스쿼트, 데드리프트)
+  reps          Int       // 반복 횟수
+  sets          Int       // 세트 수
+  weight        Float?    // 무게 (선택적, 예: kg)
+  duration      Int?      // 운동 시간 (선택적, 예: 분)
 }
 
 enum Role {

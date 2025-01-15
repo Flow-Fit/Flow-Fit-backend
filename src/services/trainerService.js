@@ -24,6 +24,7 @@ const checkOrCreateTrainer = async (user) => {
     }
 };
 
+//트레이너가 멤버 추가
 const addMemberToTrainer = async (trainerId, memberId) => {
     // 멤버와 트레이너가 존재하는지 확인
     const [trainer, member] = await Promise.all([
@@ -44,10 +45,10 @@ const addMemberToTrainer = async (trainerId, memberId) => {
     }
 
     // 멤버가 이미 트레이너의 관리 목록에 있는지 확인
-    const existingRelation = await prisma.trainer.findFirst({
+    const existingRelation = await prisma.trainerMember.findFirst({
         where: {
-            id: trainerId,
-            members: { some: { id: memberId } },
+            trainerId: trainerId,
+            memberId: memberId,
         },
     });
 
@@ -56,12 +57,11 @@ const addMemberToTrainer = async (trainerId, memberId) => {
     }
 
     // 멤버를 트레이너의 관리 목록에 추가
-    await prisma.trainer.update({
-        where: { id: trainerId },
+    await prisma.trainerMember.create({
         data: {
-            members: {
-                connect: { id: memberId },
-            },
+            trainerId: trainerId,
+            memberId: memberId,
+            ptStartDate: new Date(), // PT 시작일은 현재 날짜로 설정 (필요 시 변경 가능)
         },
     });
 
@@ -74,7 +74,7 @@ const getTrainerMembers = async (trainerId, page = 1, limit = 10) => {
 
     const [members, total] = await Promise.all([
         prisma.member.findMany({
-            where: { trainers: { some: { id: trainerId } } },
+            where: { trainers: { some: { trainerId: trainerId } } },
             skip: offset,
             take: limit,
             include: {
@@ -102,7 +102,7 @@ const getMemberByTrainer = async (trainerId, memberId) => {
     const member = await prisma.member.findFirst({
         where: {
             id: memberId,
-            trainers: { some: { id: trainerId } }},
+            trainers: { some: { trainerId: trainerId } }},
         include: {
             user: {
                 select: {
@@ -151,7 +151,7 @@ const getTrainerSchedulesByMonth = async (trainerId, month) => {
 
 // 스케줄 상태 열거형
 const ScheduleStatus = {
-    trainer_PROPOSED: "trainer_PROPOSED",
+    MEMBER_PROPOSED: "MEMBER_PROPOSED",
     TRAINER_PROPOSED: "TRAINER_PROPOSED",
     SCHEDULED: "SCHEDULED",
     REJECTED: "REJECTED",

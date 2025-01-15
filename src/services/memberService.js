@@ -3,6 +3,7 @@ const { ErrorCodes, CustomError } = require("../middlewares/errorHandler");
 
 const prisma = new PrismaClient();
 
+// 멤버 엔티티가 있는 지 확인하고 없으면 생성
 const checkOrCreateMember = async (user) => {
     if (user.role === 'MEMBER') {
         // 회원(Member) 엔트리 확인
@@ -24,6 +25,7 @@ const checkOrCreateMember = async (user) => {
     }
 };
 
+// 이번 달의 멤버의 스켸줄
 const getMemberSchedulesByMonth = async (memberId, month) => {
     const startOfMonth = new Date(month);
     startOfMonth.setDate(1); // 달의 첫 날
@@ -41,10 +43,11 @@ const getMemberSchedulesByMonth = async (memberId, month) => {
     return schedules;
 };
 
+// 관련된 트레이너들을 가져옴
 const getRelatedTrainers = async (memberId) => {
     const trainers = await prisma.trainer.findMany({
         where: {
-            members: { some: { id: memberId } },
+            members: { some: {  memberId: memberId } },
         },
         include: {
             user: {
