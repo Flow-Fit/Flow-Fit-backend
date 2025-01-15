@@ -159,12 +159,13 @@ const ScheduleStatus = {
 };
 
 // 트레이너가 스케줄 제안
-const proposeScheduleByTrainer = async (trainerId, memberId, date, location) => {
+const proposeScheduleByTrainer = async (trainerId, memberId, date, location, trainingTarget) => {
     return await prisma.schedule.create({
         data: {
             date,
             location,
             status: ScheduleStatus.TRAINER_PROPOSED,
+            trainingTarget,
             trainerId,
             memberId,
         },

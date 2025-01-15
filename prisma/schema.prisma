@@ -64,7 +64,7 @@ model Schedule {
   date         DateTime // PT 날짜 및 시간
   location     String?  // PT 장소 (선택적)
   status       Status   @default(SCHEDULED) // 일정 상태
-  trainingTarget String
+  trainingTarget String // 기본값 설정
   comment      String?
   exerciseDetails ExerciseDetail[]
   memberId     Int

@@ -199,6 +199,9 @@ router.get("/schedules", authenticateToken, trainerMiddleware, getTrainerSchedul
  *               location:
  *                 type: string
  *                 description: "스케줄 장소"
+ *               trainingTarget:
+ *                 type: string
+ *                 description: "운동 부위"
  *     responses:
  *       201:
  *         description: "스케줄 생성 성공"
@@ -328,6 +331,10 @@ module.exports = router;
  *           type: string
  *           description: "스케줄 장소"
  *           example: "Gym A"
+ *         trainingTarget:
+ *           type: string
+ *           description: "운동 부위"
+ *           example: "등"
  *         status:
  *           type: string
  *           enum:
