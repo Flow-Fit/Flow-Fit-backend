@@ -58,9 +58,9 @@ const getMemberByTrainerController = asyncHandler(async (req, res) => {
 
 // 스케줄 제안 (트레이너)
 const proposeScheduleByTrainerController = asyncHandler(async (req, res) => {
-    const { memberId, date, location } = req.body;
+    const { memberId, date, location, trainingTarget } = req.body;
     const trainer= req.role; 
-    const schedule = await proposeScheduleByTrainer(trainer.id, memberId, new Date(date), location);
+    const schedule = await proposeScheduleByTrainer(trainer.id, memberId, new Date(date), location, trainingTarget);
     res.status(201).json(schedule);
 });
 
