@@ -1,0 +1,255 @@
+openapi: 3.0.0
+info:
+  title: Project PTLink API
+  version: 1.0.0
+  description: API documentation for PTLink
+servers:
+  - url: "/"
+    description: API server
+
+components:
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: "요청 성공 여부"
+          example: true
+        message:
+          type: string
+          description: "응답 메시지"
+          example: "요청이 성공적으로 처리되었습니다."
+        data:
+          type: object
+          description: "응답 데이터"
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errorCode:
+          type: integer
+          description: "에러 코드"
+          example: 400
+        message:
+          type: string
+          description: "에러 메시지"
+          example: "요청이 잘못되었습니다."
+
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "스케줄 ID"
+          example: 1
+        date:
+          type: string
+          format: date-time
+          description: "스케줄 날짜 및 시간"
+          example: "2025-01-01T10:00:00Z"
+        location:
+          type: string
+          description: "스케줄 장소"
+          example: "Gym A"
+        trainingTarget:
+          type: string
+          description: "운동 부위"
+          example: "등"
+        status:
+          type: string
+          enum:
+            - MEMBER_PROPOSED
+            - TRAINER_PROPOSED
+            - SCHEDULED
+            - REJECTED
+            - CANCELED
+          description: "스케줄 상태"
+          example: "TRAINER_PROPOSED"
+        memberId:
+          type: integer
+          description: "멤버 ID"
+          example: 1
+        trainerId:
+          type: integer
+          description: "트레이너 ID"
+          example: 2
+
+    ScheduleArrayResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "스케줄 조회 성공"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schedule"
+
+    TrainersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "트레이너 조회 성공"
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: "트레이너 ID"
+                example: 2
+              name:
+                type: string
+                description: "트레이너 이름"
+                example: "Jane Doe"
+              email:
+                type: string
+                description: "트레이너 이메일"
+                example: "jane.doe@example.com"
+              phoneNumber:
+                type: string
+                description: "트레이너 전화번호"
+                example: "010-1234-5678"
+
+    Member:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "회원 ID"
+          example: 1
+        user:
+          type: object
+          properties:
+            name:
+              type: string
+              description: "회원 이름"
+              example: "김철수"
+            email:
+              type: string
+              description: "회원 이메일"
+              example: "example@gmail.com"
+            phoneNumber:
+              type: string
+              description: "회원 전화번호"
+              example: "010-1234-5678"
+
+    MemberArrayResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "회원 리스트 조회 성공"
+        data:
+          type: object
+          properties:
+            members:
+              type: array
+              items:
+                $ref: "#/components/schemas/Member"
+            total:
+              type: integer
+              description: "총 회원 수"
+              example: 100
+
+    MemberResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "회원 조회 성공"
+        data:
+          $ref: "#/components/schemas/Member"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "사용자 ID"
+          example: 1
+        username:
+          type: string
+          description: "사용자 고유 이름"
+          example: "john_doe"
+        email:
+          type: string
+          description: "사용자 이메일"
+          example: "john.doe@example.com"
+        name:
+          type: string
+          description: "사용자 이름"
+          example: "John Doe"
+        role:
+          type: string
+          enum: [MEMBER, TRAINER]
+          description: "사용자 역할"
+          example: "MEMBER"
+        createdAt:
+          type: string
+          format: date-time
+          description: "사용자 생성 날짜"
+          example: "2025-01-01T10:00:00Z"
+
+    CreateUser:
+      type: object
+      properties:
+        username:
+          type: string
+          description: "사용자 고유 이름"
+        password:
+          type: string
+          description: "사용자 비밀번호"
+        email:
+          type: string
+          description: "사용자 이메일"
+        name:
+          type: string
+          description: "사용자 이름"
+        role:
+          type: string
+          enum: [MEMBER, TRAINER]
+          description: "사용자 역할"
+      required:
+        - username
+        - password
+        - email
+        - name
+        - role
+
+    LoginUser:
+      type: object
+      properties:
+        username:
+          type: string
+          description: "사용자 고유 이름"
+        password:
+          type: string
+          description: "사용자 비밀번호"
+      required:
+        - username
+        - password
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

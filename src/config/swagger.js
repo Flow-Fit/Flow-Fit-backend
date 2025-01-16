@@ -1,5 +1,6 @@
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const path = require('path');
 
 const options = {
   definition: {
@@ -16,7 +17,9 @@ const options = {
         },
       ],
   },
-  apis: ['./src/routers/*.js'], // 라우트 파일에서 Swagger 주석을 가져옴
+  apis: ['./src/routers/*.js',
+    path.resolve(__dirname, 'swaggerComponents.yaml'),
+  ], // 라우트 파일에서 Swagger 주석을 가져옴
 };
 
 const swaggerSpec = swaggerJSDoc(options);
