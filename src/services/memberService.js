@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { ErrorCodes, CustomError } = require("../middlewares/errorHandler");
+const { ErrorCodes, CustomError } = require("../utils/error");
 
 const prisma = new PrismaClient();
 

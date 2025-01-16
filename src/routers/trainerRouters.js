@@ -36,11 +36,7 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "멤버가 트레이너의 관리 목록에 추가되었습니다."
+ *               $ref: "#/components/schemas/SuccessResponse"
  *       404:
  *         description: "트레이너 또는 멤버를 찾을 수 없음"
  *       409:
@@ -73,31 +69,7 @@ router.post('/members/:memberId', authenticateToken, trainerMiddleware, addMembe
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 members:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         description: "회원 ID"
- *                       user:
- *                         type: object
- *                         properties:
- *                           name:
- *                             type: string
- *                             description: "회원 이름"
- *                           email:
- *                             type: string
- *                             description: "회원 이메일"
- *                           phoneNumber:
- *                             type: string
- *                             description: "회원 전화번호"
- *                 total:
- *                   type: integer
- *                   description: "총 회원 수"
+ *               $ref: "#/components/schemas/MemberListResponse"
  */
 router.get("/members", authenticateToken, trainerMiddleware, getTrainerMembersController);
 
@@ -122,23 +94,7 @@ router.get("/members", authenticateToken, trainerMiddleware, getTrainerMembersCo
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: "회원 ID"
- *                 user:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                       description: "회원 이름"
- *                     email:
- *                       type: string
- *                       description: "회원 이메일"
- *                     phoneNumber:
- *                       type: string
- *                       description: "회원 전화번호"
+ *               $ref: "#/components/schemas/MemberResponse"
  *       403:
  *         description: "트레이너의 관리 대상이 아님"
  *       404:
@@ -170,7 +126,7 @@ router.get("/members/:memberId", authenticateToken, trainerMiddleware, getMember
  *             schema:
  *               type: array
  *               items:
- *                 $ref: "#/components/schemas/Schedule"
+ *                 $ref: "#/components/schemas/ScheduleArrayResponse"
  */
 router.get("/schedules", authenticateToken, trainerMiddleware, getTrainerSchedulesByMonthController);
 
@@ -208,7 +164,7 @@ router.get("/schedules", authenticateToken, trainerMiddleware, getTrainerSchedul
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Schedule"
+ *               $ref: "#/components/schemas/ScheduleResponse"
  *       400:
  *         description: "잘못된 요청"
  *       401:
@@ -237,7 +193,7 @@ router.post("/schedules/propose", authenticateToken, trainerMiddleware, proposeS
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Schedule"
+ *               $ref: "#/components/schemas/ScheduleResponse"
  *       400:
  *         description: "잘못된 요청"
  *       401:
@@ -268,7 +224,7 @@ router.put( "/schedules/:scheduleId/accept", authenticateToken, trainerMiddlewar
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Schedule"
+ *               $ref: "#/components/schemas/ScheduleResponse"
  *       400:
  *         description: "잘못된 요청"
  *       401:
@@ -299,7 +255,7 @@ router.put( "/schedules/:scheduleId/reject", authenticateToken, trainerMiddlewar
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Schedule"
+ *               $ref: "#/components/schemas/ScheduleResponse"
  *       400:
  *         description: "잘못된 요청"
  *       401:
@@ -310,52 +266,3 @@ router.put( "/schedules/:scheduleId/reject", authenticateToken, trainerMiddlewar
 router.delete( "/schedules/:scheduleId/cancel", authenticateToken, trainerMiddleware, cancelScheduleByTrainerController );
 
 module.exports = router;
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Schedule:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           description: "스케줄 ID"
- *           example: 1
- *         date:
- *           type: string
- *           format: date-time
- *           description: "스케줄 날짜 및 시간"
- *           example: "2025-01-01T10:00:00Z"
- *         location:
- *           type: string
- *           description: "스케줄 장소"
- *           example: "Gym A"
- *         trainingTarget:
- *           type: string
- *           description: "운동 부위"
- *           example: "등"
- *         status:
- *           type: string
- *           enum:
- *             - MEMBER_PROPOSED
- *             - TRAINER_PROPOSED
- *             - SCHEDULED
- *             - REJECTED
- *             - CANCELED
- *           description: "스케줄 상태"
- *           example: "TRAINER_PROPOSED"
- *         memberId:
- *           type: integer
- *           description: "멤버 ID"
- *           example: 1
- *         trainerId:
- *           type: integer
- *           description: "트레이너 ID"
- *           example: 2
- *   securitySchemes:
- *     BearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- */
