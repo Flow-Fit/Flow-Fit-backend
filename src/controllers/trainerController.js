@@ -10,6 +10,8 @@ const {
 } = require("../services/trainerService");
 
 const asyncHandler = require('../utils/asyncHandler');
+const { successResponse } = require('../utils/responseHelper');
+const { CustomError, ErrorCodes } = require('../utils/error');
 
 // 멤버를 트레이너의 관리 목록에 추가
 const addMemberToTrainerController = asyncHandler(async (req, res) => {
@@ -17,7 +19,7 @@ const addMemberToTrainerController = asyncHandler(async (req, res) => {
     const trainer = req.role; // 로그인한 트레이너 정보
 
     const result = await addMemberToTrainer(trainer.id, parseInt(memberId));
-    res.status(201).json(result);
+    res.status(201).json(successResponse(result, "멤버 추가 성공"));
 });
 
 // 트레이너가 관리하는 모든 회원 리스트
@@ -26,7 +28,7 @@ const getTrainerMembersController = asyncHandler(async (req, res) => {
     const trainer = req.role; 
 
     const result = await getTrainerMembers(trainer.id, parseInt(page), parseInt(limit));
-    res.status(200).json(result);
+    res.status(200).json(successResponse(result, "회원 리스트 조회 성공"));
 });
 
 // 트레이너의 모든 스케줄 (특정 한 달)
@@ -44,7 +46,7 @@ const getTrainerSchedulesByMonthController = asyncHandler(async (req, res) => {
     }
 
     const schedules = await getTrainerSchedulesByMonth(trainer.id, monthDate);
-    res.status(200).json(schedules);
+    res.status(200).json(successResponse(schedules, "스케줄 리스트 조회 성공"));
 });
 
 // 관리하는 특정 회원 조회
@@ -52,40 +54,40 @@ const getMemberByTrainerController = asyncHandler(async (req, res) => {
     const { memberId } = req.params;
     const trainer = req.role;
 
-    const data = await getMemberByTrainer(trainer.id, parseInt(memberId));
-    res.status(200).json(data);
+    const Member = await getMemberByTrainer(trainer.id, parseInt(memberId));
+    res.status(200).json(successResponse(Member, "회원 조회 성공"));
 });
 
 // 스케줄 제안 (트레이너)
 const proposeScheduleByTrainerController = asyncHandler(async (req, res) => {
     const { memberId, date, location, trainingTarget } = req.body;
-    const trainer= req.role; 
+    const trainer = req.role; 
     const schedule = await proposeScheduleByTrainer(trainer.id, memberId, new Date(date), location, trainingTarget);
-    res.status(201).json(schedule);
+    res.status(201).json(successResponse(schedule, "스케줄 제안 성공"));
 });
 
 // 스케줄 수락 (트레이너)
 const acceptScheduleByTrainerController = asyncHandler(async (req, res) => {
-    const trainer= req.role; 
+    const trainer = req.role; 
     const { scheduleId } = req.params;
     const schedule = await acceptScheduleByTrainer(trainer.id, parseInt(scheduleId));
-    res.status(200).json(schedule);
+    res.status(200).json(successResponse(schedule, "스케줄 수락 성공"));
 });
 
 // 스케줄 거절 (트레이너)
 const rejectScheduleByTrainerController = asyncHandler(async (req, res) => {
-    const trainer= req.role; 
+    const trainer = req.role; 
     const { scheduleId } = req.params;
     const schedule = await rejectScheduleByTrainer(trainer.id, parseInt(scheduleId));
-    res.status(200).json(schedule);
+    res.status(200).json(successResponse(schedule, "스케줄 거절 성공"));
 });
 
 // 스케줄 취소/삭제 (트레이너)
 const cancelScheduleByTrainerController = asyncHandler(async (req, res) => {
-    const trainer= req.role; 
+    const trainer = req.role; 
     const { scheduleId } = req.params;
     const result = await cancelScheduleByTrainer(trainer.id, parseInt(scheduleId));
-    res.status(200).json(result);
+    res.status(200).json(successResponse(result, "스케줄 취소 성공"));
 });
 
 module.exports = {

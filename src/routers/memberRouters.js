@@ -33,9 +33,7 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: "#/components/schemas/Schedule"
+ *               $ref: "#/components/schemas/ScheduleArrayResponse"
  */
 router.get('/schedules', authenticateToken, memberMiddleware, getMemberSchedulesByMonthController);
 
@@ -53,22 +51,7 @@ router.get('/schedules', authenticateToken, memberMiddleware, getMemberSchedules
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     description: "트레이너 ID"
- *                   name:
- *                     type: string
- *                     description: "트레이너 이름"
- *                   email:
- *                     type: string
- *                     description: "트레이너 이메일"
- *                   phoneNumber:
- *                     type: string
- *                     description: "트레이너 전화번호"
+ *               $ref: "#/components/schemas/TrainersResponse"
  */
 router.get('/trainers', authenticateToken, memberMiddleware, getRelatedTrainersController);
 
@@ -103,13 +86,15 @@ router.get('/trainers', authenticateToken, memberMiddleware, getRelatedTrainersC
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Schedule"
- *       400:
- *         description: "잘못된 요청"
- *       401:
- *         description: "인증 실패"
+ *               $ref: "#/components/schemas/ScheduleResponse"
+ *       errorCode:
+ *         description: "오류 응답"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  */
-router.post("schedules/propose", authenticateToken, memberMiddleware, proposeScheduleByMemberController );
+router.post('/schedules/propose', authenticateToken, memberMiddleware, proposeScheduleByMemberController);
 
 /**
  * @swagger
@@ -132,15 +117,15 @@ router.post("schedules/propose", authenticateToken, memberMiddleware, proposeSch
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Schedule"
- *       400:
- *         description: "잘못된 요청"
- *       401:
- *         description: "인증 실패"
- *       403:
- *         description: "권한 없음"
+ *               $ref: "#/components/schemas/ScheduleResponse"
+ *       errorCode:
+ *         description: "오류 응답"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  */
-router.put( "/schedules/:scheduleId/accept", authenticateToken, memberMiddleware, acceptScheduleByMemberController );
+router.put('/schedules/:scheduleId/accept', authenticateToken, memberMiddleware, acceptScheduleByMemberController);
 
 /**
  * @swagger
@@ -163,17 +148,15 @@ router.put( "/schedules/:scheduleId/accept", authenticateToken, memberMiddleware
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Schedule"
- *       400:
- *         description: "잘못된 요청"
- *       401:
- *         description: "인증 실패"
- *       403:
- *         description: "권한 없음"
+ *               $ref: "#/components/schemas/ScheduleResponse"
+ *       errorCode:
+ *         description: "오류 응답"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  */
-router.put(
-    "/schedules/:scheduleId/reject", authenticateToken, memberMiddleware, rejectScheduleByMemberController
-);
+router.put('/schedules/:scheduleId/reject', authenticateToken, memberMiddleware, rejectScheduleByMemberController);
 
 /**
  * @swagger
@@ -196,59 +179,14 @@ router.put(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Schedule"
- *       400:
- *         description: "잘못된 요청"
- *       401:
- *         description: "인증 실패"
- *       403:
- *         description: "권한 없음"
+ *               $ref: "#/components/schemas/ScheduleResponse"
+ *       errorCode:
+ *         description: "오류 응답"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ErrorResponse"
  */
-router.delete( "/schedules/:scheduleId/cancel", authenticateToken, memberMiddleware, cancelScheduleByMemberController );
+router.delete('/schedules/:scheduleId/cancel', authenticateToken, memberMiddleware, cancelScheduleByMemberController);
 
 module.exports = router;
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Schedule:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           description: "스케줄 ID"
- *           example: 1
- *         date:
- *           type: string
- *           format: date-time
- *           description: "스케줄 날짜 및 시간"
- *           example: "2025-01-01T10:00:00Z"
- *         location:
- *           type: string
- *           description: "스케줄 장소"
- *           example: "Gym A"
- *         status:
- *           type: string
- *           enum:
- *             - MEMBER_PROPOSED
- *             - TRAINER_PROPOSED
- *             - SCHEDULED
- *             - REJECTED
- *             - CANCELED
- *           description: "스케줄 상태"
- *           example: "MEMBER_PROPOSED"
- *         memberId:
- *           type: integer
- *           description: "멤버 ID"
- *           example: 1
- *         trainerId:
- *           type: integer
- *           description: "트레이너 ID"
- *           example: 2
- *   securitySchemes:
- *     BearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- */

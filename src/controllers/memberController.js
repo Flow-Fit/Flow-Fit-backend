@@ -8,7 +8,9 @@ const {
 } = require("../services/memberService");
 
 const asyncHandler = require('../utils/asyncHandler');
- 
+const { successResponse} = require('../utils/responseHelper');
+const { CustomError, ErrorCodes } = require('../utils/error');
+
 // 멤버가 자신의 스케줄 조회 (특정 한 달)
 const getMemberSchedulesByMonthController = asyncHandler(async (req, res) => {
     const { month } = req.query;
@@ -25,14 +27,14 @@ const getMemberSchedulesByMonthController = asyncHandler(async (req, res) => {
 
     const schedules = await getMemberSchedulesByMonth(member.id, monthDate);
 
-    res.status(200).json(schedules);
+    res.status(200).json(successResponse(schedules, "스케줄 조회 성공"));
 });
 
 // 멤버가 자신과 관련 있는 트레이너 조회
 const getRelatedTrainersController = asyncHandler(async (req, res) => {
     const member = req.role;
     const trainers = await getRelatedTrainers(member.id);
-    res.status(200).json(trainers);
+    res.status(200).json(successResponse(trainers, "트레이너 조회 성공"));
 });
 
 // 스케줄 제안 (멤버)
@@ -40,7 +42,7 @@ const proposeScheduleByMemberController = asyncHandler(async (req, res) => {
     const { trainerId, date, location } = req.body;
     const member = req.role; 
     const schedule = await proposeScheduleByMember(trainerId, member.id, new Date(date), location);
-    res.status(201).json(schedule);
+    res.status(201).json(successResponse(schedule, "스케줄 제안 성공"));
 });
 
 // 스케줄 수락 (멤버)
@@ -48,7 +50,7 @@ const acceptScheduleByMemberController = asyncHandler(async (req, res) => {
     const member = req.role; 
     const { scheduleId } = req.params;
     const schedule = await acceptScheduleByMember(member.id, parseInt(scheduleId));
-    res.status(200).json(schedule);
+    res.status(200).json(successResponse(schedule, "스케줄 수락 성공"));
 });
 
 // 스케줄 거절 (멤버)
@@ -56,7 +58,7 @@ const rejectScheduleByMemberController = asyncHandler(async (req, res) => {
     const member = req.role; 
     const { scheduleId } = req.params;
     const schedule = await rejectScheduleByMember(member.id, parseInt(scheduleId));
-    res.status(200).json(schedule);
+    res.status(200).json(successResponse(schedule, "스케줄 거절 성공"));
 });
 
 // 스케줄 취소/삭제 (멤버)
@@ -64,7 +66,7 @@ const cancelScheduleByMemberController = asyncHandler(async (req, res) => {
     const member = req.role; 
     const { scheduleId } = req.params;
     const result = await cancelScheduleByMember(member.id, parseInt(scheduleId));
-    res.status(200).json(result);
+    res.status(200).json(successResponse(result, "스케줄 취소 성공"));
 });
 
 module.exports = {

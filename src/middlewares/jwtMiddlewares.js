@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { ErrorCodes, CustomError } = require("./errorHandler");
+const { ErrorCodes, CustomError } = require("../utils/error");
 const asyncHandler = require("../utils/asyncHandler");
 const { getUserById } = require("../services/userService");
 

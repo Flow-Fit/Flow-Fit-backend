@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const { assert } = require('superstruct');
 const { createUserStruct,updateUserStruct } = require('../struct/userStruct');
 const { hashPassword, comparePassword , removePasswordField } = require("../utils/password");
-const { ErrorCodes, CustomError } = require("../middlewares/errorHandler");
+const { ErrorCodes, CustomError } = require("../utils/error");
 const jwt = require('jsonwebtoken');
 
 const prisma = new PrismaClient();
