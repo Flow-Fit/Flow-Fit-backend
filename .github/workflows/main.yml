@@ -21,11 +21,8 @@ jobs:
       # Docker 이미지 빌드 및 푸시
       - name: Build and Push Docker image
         run: |
-          IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/docker-test-app
-          docker build \
-            --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} \
-            --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
-            -t $IMAGE_NAME:latest .
+          IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/flow-fit
+          docker build --no-cache -t $IMAGE_NAME:latest .
           docker push $IMAGE_NAME:latest
 
   deploy:
@@ -49,8 +46,11 @@ jobs:
             docker rm my-app || true
 
             # 최신 Docker 이미지 가져오기
-            IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/docker-test-app
+            IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/flow-fit
             docker pull $IMAGE_NAME:latest
 
             # 새로운 컨테이너 실행
-            docker run -d --name my-app -p 80:3000 $IMAGE_NAME:latest
+            docker run -d --name my-app -p 3000:3000 \
+              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              $IMAGE_NAME:latest
